@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { useCart } from '../context/CartContext.jsx';
 import { imgUrl } from '../data/products.js';
 import { categoryIcons } from '../data/categoryIcons.js';
 
@@ -11,6 +12,7 @@ const HINT_VISIBLE_MS = 7000;
 export default function AIDiagnosticChat() {
   const navigate = useNavigate();
   const products = useProducts();
+  const { addToCart } = useCart();
   const [open, setOpen] = useState(false);
 
   const [history, setHistory] = useState(() => {
@@ -26,6 +28,7 @@ export default function AIDiagnosticChat() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showHint, setShowHint] = useState(true);
+  const [addedId, setAddedId] = useState(null);
 
   const [pos, setPos] = useState(() => {
     try {
@@ -166,6 +169,13 @@ export default function AIDiagnosticChat() {
     navigate(`/categorie/${cat}?openProduct=${id}`);
   };
 
+  const handleAddToCart = (e, product) => {
+    e.stopPropagation();
+    addToCart(product);
+    setAddedId(product.id);
+    setTimeout(() => setAddedId(null), 1500);
+  };
+
   const panelStyle = pos
     ? { left: Math.min(pos.x, window.innerWidth - 400), top: Math.max(pos.y - 570, 12) }
     : { left: 24, bottom: 96 };
@@ -210,7 +220,7 @@ export default function AIDiagnosticChat() {
 
       {open && (
         <div
-          className="fixed z-[151] w-[380px] max-w-[90vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-chat-pop"
+          className="fixed z-[151] w-[380px] max-w-[92vw] h-[560px] max-h-[80vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-chat-pop"
           style={panelStyle}
         >
           <div className="bg-teal text-white px-4 py-3.5 flex items-center justify-between flex-shrink-0">
@@ -256,19 +266,33 @@ export default function AIDiagnosticChat() {
                           ? imgUrl(p.image)
                           : categoryIcons[p.cat] || '/product-images/placeholder.svg';
                         return (
-                          <button
+                          <div
                             key={rec.id}
-                            onClick={() => goToProduct(p.id, p.cat)}
                             style={{ animationDelay: `${0.15 + i * 0.08}s` }}
-                            className="water-fill-in-item w-full flex gap-2.5 bg-white border border-ink/10 rounded-xl p-2.5 text-left hover:border-teal hover:shadow-md transition"
+                            className="water-fill-in-item bg-white border border-ink/10 rounded-xl p-2.5 hover:border-teal hover:shadow-md transition"
                           >
-                            <img src={photoSrc} alt={p.name} className="w-12 h-12 rounded-lg object-cover bg-aqua flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-semibold leading-tight mb-0.5 truncate">{p.name}</div>
-                              <div className="text-[11px] text-ink/55 leading-snug line-clamp-2 mb-1">{rec.reason}</div>
-                              <div className="font-mono text-xs font-semibold text-tealDeep">{p.price} د.ت</div>
-                            </div>
-                          </button>
+                            <button
+                              onClick={() => goToProduct(p.id, p.cat)}
+                              className="w-full flex gap-2.5 text-left"
+                            >
+                              <img src={photoSrc} alt={p.name} className="w-12 h-12 rounded-lg object-cover bg-aqua flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-semibold leading-tight mb-0.5 truncate">{p.name}</div>
+                                <div className="text-[11px] text-ink/55 leading-snug line-clamp-2 mb-1">{rec.reason}</div>
+                                <div className="font-mono text-xs font-semibold text-tealDeep">{p.price} د.ت</div>
+                              </div>
+                            </button>
+                            <button
+                              onClick={(e) => handleAddToCart(e, p)}
+                              className={`w-full mt-2 py-2 rounded-lg text-xs font-semibold transition ${
+                                addedId === p.id
+                                  ? 'bg-teal/10 text-teal'
+                                  : 'bg-teal text-white hover:bg-tealLight'
+                              }`}
+                            >
+                              {addedId === p.id ? '✓ Ajouté au panier' : '+ Ajouter au panier'}
+                            </button>
+                          </div>
                         );
                       })}
                     </div>
