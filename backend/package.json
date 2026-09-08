@@ -1,0 +1,18 @@
+{
+  "name": "crystal-water-backend",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^2.3.0",
+    "pg": "^8.23.0",
+    "sharp": "^0.35.4"
+  }
+}

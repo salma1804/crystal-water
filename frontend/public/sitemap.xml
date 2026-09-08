@@ -1,0 +1,22 @@
+@"
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.crystalwater.tn/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/osmoseurs</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/adoucisseurs</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/cartouches-filtrantes</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/sterilisateurs-uv</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/membranes-porte-membrane</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/filtration-eau</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/vannes-frp-tank</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/medias-filtrants</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/electrovannes-pressostats</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/fontaines-fraiches</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/debitmetres-manometres</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/pieces-detachees-industriel</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/pompes-rotatives-moteurs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/pompes-eau</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/pompes-doseuses-antiscalant</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.crystalwater.tn/categorie/instruments-mesure-eau</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+</urlset>
+"@ | Out-File -FilePath sitemap.xml -Encoding utf8
