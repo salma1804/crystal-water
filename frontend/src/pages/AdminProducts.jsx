@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useAdmin } from '../context/AdminContext.jsx';
 import { useProductsAdmin } from '../context/ProductsContext.jsx';
 import { categories } from '../i18n/translations.js';
@@ -54,8 +54,9 @@ function EditRow({ product, onSaved, token }) {
   };
 
   return (
-    <tr className={`border-t border-ink/10 ${!inStock ? 'opacity-50' : ''}`}>
+    <tr className={`border-t border-ink/10 ${!inStock ? 'bg-red-50/40' : ''}`}>
       <td className="py-2 px-3 text-sm max-w-[220px] truncate" title={product.name}>
+        {!inStock && <span className="mr-1.5">⚠️</span>}
         {product.name} {isCustom && <span className="text-[10px] bg-gold/30 text-ink px-1.5 py-0.5 rounded ml-1">créé</span>}
       </td>
       <td className="py-2 px-3">
@@ -256,10 +257,20 @@ export default function AdminProducts() {
   const { token } = useAdmin();
   const { products, loading, refresh } = useProductsAdmin();
   const [search, setSearch] = useState('');
+  const [onlyOutOfStock, setOnlyOutOfStock] = useState(false);
 
-  const filtered = products.filter((p) =>
+  const outOfStockCount = products.filter((p) => !p.inStock).length;
+
+  let filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (onlyOutOfStock) {
+    filtered = filtered.filter((p) => !p.inStock);
+  } else {
+    // Regroupe les ruptures de stock en premier, pour une vue d'ensemble rapide
+    filtered = [...filtered].sort((a, b) => Number(a.inStock) - Number(b.inStock));
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
@@ -270,13 +281,25 @@ export default function AdminProducts() {
 
       <AddProductForm onAdded={refresh} token={token} />
 
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Rechercher un produit..."
-        className="w-full max-w-sm px-4 py-2.5 border border-ink/15 rounded-full text-sm mb-4"
-      />
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher un produit..."
+          className="w-full max-w-sm px-4 py-2.5 border border-ink/15 rounded-full text-sm"
+        />
+        <button
+          onClick={() => setOnlyOutOfStock((v) => !v)}
+          className={`px-4 py-2 rounded-full text-xs font-semibold border transition ${
+            onlyOutOfStock
+              ? 'bg-red-500 text-white border-red-500'
+              : 'border-ink/15 text-ink/70 hover:border-red-300'
+          }`}
+        >
+          ⚠️ Ruptures de stock ({outOfStockCount})
+        </button>
+      </div>
 
       {loading ? (
         <p className="text-sm text-ink/50">Chargement...</p>
@@ -299,6 +322,9 @@ export default function AdminProducts() {
               ))}
             </tbody>
           </table>
+          {filtered.length === 0 && (
+            <p className="text-sm text-ink/40 p-6 text-center">Aucun produit en rupture de stock. 🎉</p>
+          )}
           {filtered.length > 200 && (
             <p className="text-xs text-ink/40 p-3">Affinez la recherche — {filtered.length} résultats, 200 affichés.</p>
           )}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { imgUrl } from '../data/products.js';
@@ -78,16 +78,28 @@ export default function SearchBar({ className = '' }) {
               const photoSrc = p.hasRealPhoto
                 ? imgUrl(p.image)
                 : categoryIcons[p.cat] || '/product-images/placeholder.svg';
+              const outOfStock = p.inStock === false;
               return (
                 <button
                   key={p.id}
                   onClick={() => goToProduct(p)}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-mineral2 transition text-left border-b border-ink/5 last:border-b-0"
+                  className={`w-full flex items-center gap-3 p-3 hover:bg-mineral2 transition text-left border-b border-ink/5 last:border-b-0 ${outOfStock ? 'opacity-60' : ''}`}
                 >
-                  <img src={photoSrc} alt={p.name} className="w-10 h-10 rounded object-cover bg-aqua flex-shrink-0" />
+                  <img
+                    src={photoSrc}
+                    alt={p.name}
+                    className={`w-10 h-10 rounded object-cover bg-aqua flex-shrink-0 ${outOfStock ? 'grayscale' : ''}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{p.name}</div>
-                    <div className="text-xs text-ink/50">{p.price} د.ت</div>
+                    <div className="text-xs text-ink/50 flex items-center gap-1.5">
+                      {p.price} د.ت
+                      {outOfStock && (
+                        <span className="text-[10px] font-semibold text-ink/60 bg-ink/10 px-1.5 py-0.5 rounded-full">
+                          Rupture de stock
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </button>
               );
