@@ -234,7 +234,7 @@ export default function CategoryPage() {
           {list.length === 0 ? (
             <div className="text-center py-16 text-ink/50 text-sm">Pas encore de produits ici.</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {list.map((p) => (
                 <ProductCard key={p.id} product={p} autoOpen={String(p.id) === openProductId} />
               ))}
@@ -306,7 +306,7 @@ export default function CategoryPage() {
                 {list.length === 0 ? (
                   <div className="text-center py-16 text-ink/50 text-sm">Pas encore de produits ici.</div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                     {list.map((p) => (
                       <ProductCard key={p.id} product={p} autoOpen={String(p.id) === openProductId} />
                     ))}
@@ -325,7 +325,7 @@ export default function CategoryPage() {
                 {list.length === 0 ? (
                   <div className="text-center py-16 text-ink/50 text-sm">Pas encore de produits ici.</div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                     {list.map((p) => (
                       <ProductCard key={p.id} product={p} autoOpen={String(p.id) === openProductId} />
                     ))}
