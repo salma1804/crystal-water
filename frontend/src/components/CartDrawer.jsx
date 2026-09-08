@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
@@ -71,24 +71,24 @@ export default function CartDrawer() {
           visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
         }`}
       >
-        <div className="px-8 py-6 bg-gradient-to-r from-teal to-tealDeep text-white flex items-center justify-between flex-shrink-0">
+        <div className="px-5 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-teal to-tealDeep text-white flex items-center justify-between flex-shrink-0">
           <div>
-            <h2 className="font-display text-2xl font-bold">🛒 {t('cart_title')}</h2>
+            <h2 className="font-display text-lg sm:text-2xl font-bold">🛒 {t('cart_title')}</h2>
             {cart.length > 0 && (
-              <p className="text-white/70 text-sm mt-0.5">
+              <p className="text-white/70 text-xs sm:text-sm mt-0.5">
                 {cart.length} article{cart.length > 1 ? 's' : ''} dans votre panier
               </p>
             )}
           </div>
           <button
             onClick={requestClose}
-            className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition flex-shrink-0"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           {grouped.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">💧</div>
@@ -96,7 +96,7 @@ export default function CartDrawer() {
               <p className="text-sm text-ink/50">Découvrez nos produits et commencez votre commande.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
               {grouped.map((p) => {
                 const photoSrc = p.hasRealPhoto
                   ? (p.isCustom ? p.image : imgUrl(p.image))
@@ -116,35 +116,35 @@ export default function CartDrawer() {
                       />
                       <button
                         onClick={() => removeAllOfProduct(p.id)}
-                        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-50 flex items-center justify-center text-red-500 shadow transition"
+                        className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-50 flex items-center justify-center text-red-500 shadow transition"
                         title="Retirer du panier"
                       >
                         🗑
                       </button>
                       {p.qty > 1 && (
-                        <span className="absolute top-2 left-2 bg-gold text-ink text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shadow">
+                        <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-gold text-ink text-xs font-bold w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow">
                           {p.qty}
                         </span>
                       )}
                     </div>
 
-                    <div className="p-4">
-                      <p className="text-sm font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5em]">{p.name}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-lg font-bold text-tealDeep">
+                    <div className="p-2.5 sm:p-4">
+                      <p className="text-xs sm:text-sm font-semibold leading-tight mb-1.5 sm:mb-2 line-clamp-2 min-h-[2.2em] sm:min-h-[2.5em]">{p.name}</p>
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <span className="font-mono text-sm sm:text-lg font-bold text-tealDeep">
                           {p.price * p.qty} د.ت
                         </span>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1 sm:gap-1.5">
                           <button
                             onClick={() => removeOneFromCart(p.id)}
-                            className="w-7 h-7 rounded-full border border-ink/15 flex items-center justify-center text-sm font-semibold hover:border-teal hover:text-teal transition"
+                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-ink/15 flex items-center justify-center text-xs sm:text-sm font-semibold hover:border-teal hover:text-teal transition"
                           >
                             −
                           </button>
-                          <span className="text-sm font-semibold min-w-[14px] text-center">{p.qty}</span>
+                          <span className="text-xs sm:text-sm font-semibold min-w-[12px] sm:min-w-[14px] text-center">{p.qty}</span>
                           <button
                             onClick={() => addToCart(p)}
-                            className="w-7 h-7 rounded-full border border-ink/15 flex items-center justify-center text-sm font-semibold hover:border-teal hover:text-teal transition"
+                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-ink/15 flex items-center justify-center text-xs sm:text-sm font-semibold hover:border-teal hover:text-teal transition"
                           >
                             +
                           </button>
@@ -159,28 +159,28 @@ export default function CartDrawer() {
         </div>
 
         {grouped.length > 0 && (
-          <div className="px-8 py-6 bg-white border-t border-ink/10 flex-shrink-0">
+          <div className="px-5 sm:px-8 py-5 sm:py-6 bg-white border-t border-ink/10 flex-shrink-0">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-base font-semibold text-ink/70">{t('cart_total')}</span>
-              <span className="font-mono text-3xl font-bold text-tealDeep">{total} د.ت</span>
+              <span className="text-sm sm:text-base font-semibold text-ink/70">{t('cart_total')}</span>
+              <span className="font-mono text-2xl sm:text-3xl font-bold text-tealDeep">{total} د.ت</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button
                 onClick={() => setIsOpen(false)}
-                className="order-3 sm:order-1 flex-1 py-3 border border-ink/15 text-ink text-sm font-semibold rounded-lg hover:border-teal transition"
+                className="order-3 sm:order-1 flex-1 py-2.5 sm:py-3 border border-ink/15 text-ink text-xs sm:text-sm font-semibold rounded-lg hover:border-teal transition"
               >
                 Continuer mes achats
               </button>
               <button
                 onClick={handleClearCart}
-                className="order-2 flex-1 py-3 border border-red-200 text-red-500 text-sm font-semibold rounded-lg hover:bg-red-50 transition"
+                className="order-2 flex-1 py-2.5 sm:py-3 border border-red-200 text-red-500 text-xs sm:text-sm font-semibold rounded-lg hover:bg-red-50 transition"
               >
                 Vider le panier
               </button>
               <button
                 onClick={goToCheckout}
-                className="order-1 sm:order-3 flex-[1.5] py-3 bg-teal text-white text-sm font-bold rounded-lg hover:bg-tealLight transition shadow-lg shadow-teal/30"
+                className="order-1 sm:order-3 flex-[1.5] py-2.5 sm:py-3 bg-teal text-white text-xs sm:text-sm font-bold rounded-lg hover:bg-tealLight transition shadow-lg shadow-teal/30"
               >
                 Passer la commande →
               </button>
