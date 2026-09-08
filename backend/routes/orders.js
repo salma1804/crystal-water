@@ -1,17 +1,9 @@
-// backend/routes/orders.js
+﻿// backend/routes/orders.js
 import express from 'express';
-import crypto from 'crypto';
 import { pool } from '../lib/db.js';
 import { requireAdmin } from './auth.js';
 
 const router = express.Router();
-
-function generateOrderCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = 'CW-';
-  for (let i = 0; i < 6; i++) code += chars[crypto.randomInt(chars.length)];
-  return code;
-}
 
 async function sendEmail(to, subject, html) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -93,14 +85,10 @@ function sendCustomerConfirmationEmail(order) {
     <p>Votre commande a bien été enregistrée. Voici un récapitulatif :</p>
     <ul>${itemsHtml}</ul>
     <p><b>Total : ${order.total} د.ت</b></p>
-    <p>Paiement à la livraison.</p>
-    <hr style="border:none;border-top:1px solid #eee;margin:20px 0;" />
-    <p>🔑 Votre <b>code de suivi</b>, à conserver pour retrouver votre commande à tout moment :</p>
-    <p style="font-size:22px;font-weight:bold;letter-spacing:2px;color:#2E93C4;">${order.order_code}</p>
-    <p style="color:#888;font-size:13px;">Gardez cet email — il vous permettra de retrouver votre commande même dans plusieurs mois, sur n'importe quel appareil.</p>
+    <p>Paiement à la livraison. Nous vous appelons bientôt pour confirmer.</p>
   `;
 
-  sendEmail(order.customer_email, `Votre commande Crystal Water — code ${order.order_code}`, html);
+  sendEmail(order.customer_email, `Votre commande Crystal Water — ${order.total} د.ت`, html);
 }
 
 router.post('/', async (req, res) => {
@@ -116,25 +104,12 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    let orderCode;
-    let result;
-    for (let attempt = 0; attempt < 5; attempt++) {
-      orderCode = generateOrderCode();
-      try {
-        result = await pool.query(
-          `insert into orders (customer_name, phone, address, city, items, total, order_code, customer_email, latitude, longitude, location_label)
-           values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-           returning *`,
-          [customer_name, phone, address, city, JSON.stringify(items), total, orderCode, email || null, latitude ?? null, longitude ?? null, location_label || null]
-        );
-        break;
-      } catch (err) {
-        if (err.code === '23505') continue;
-        throw err;
-      }
-    }
-
-    if (!result) throw new Error('Impossible de générer un code de commande unique.');
+    const result = await pool.query(
+      `insert into orders (customer_name, phone, address, city, items, total, customer_email, latitude, longitude, location_label)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       returning *`,
+      [customer_name, phone, address, city, JSON.stringify(items), total, email || null, latitude ?? null, longitude ?? null, location_label || null]
+    );
 
     const order = result.rows[0];
 
@@ -146,83 +121,6 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible d'enregistrer la commande." });
-  }
-});
-
-router.get('/track', async (req, res) => {
-  const { phone, code } = req.query;
-
-  if (!phone || !code) {
-    return res.status(400).json({ error: 'Téléphone et code de commande requis.' });
-  }
-
-  if (!pool) return res.json({ order: null });
-
-  const cleanPhone = phone.replace(/[\s\-\.]/g, '');
-
-  try {
-    const result = await pool.query(
-      `select id, customer_name, phone, address, city, items, total, delivered, created_at, order_code
-       from orders
-       where regexp_replace(phone, '[\\s\\-\\.]', '', 'g') = $1
-       and upper(order_code) = upper($2)`,
-      [cleanPhone, code.trim()]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Aucune commande trouvée avec ces informations.' });
-    }
-
-    res.json({ order: result.rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Impossible de récupérer la commande.' });
-  }
-});
-
-router.post('/resend-code', async (req, res) => {
-  const { phone } = req.body;
-  if (!phone) return res.status(400).json({ error: 'Téléphone requis.' });
-
-  if (!pool) return res.status(404).json({ error: 'Aucune commande trouvée.' });
-
-  const cleanPhone = phone.replace(/[\s\-\.]/g, '');
-
-  try {
-    const result = await pool.query(
-      `select order_code, customer_email, customer_name
-       from orders
-       where regexp_replace(phone, '[\\s\\-\\.]', '', 'g') = $1
-       order by created_at desc
-       limit 1`,
-      [cleanPhone]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Aucune commande trouvée avec ce numéro.' });
-    }
-
-    const { order_code, customer_email, customer_name } = result.rows[0];
-
-    if (!customer_email) {
-      return res.status(400).json({
-        error: "Aucun email n'était associé à cette commande. Contactez-nous directement sur WhatsApp pour retrouver votre commande.",
-      });
-    }
-
-    const html = `
-      <h2>🔑 Votre code de suivi Crystal Water</h2>
-      <p>Bonjour ${customer_name},</p>
-      <p>Voici votre code de suivi de commande :</p>
-      <p style="font-size:22px;font-weight:bold;letter-spacing:2px;color:#2E93C4;">${order_code}</p>
-    `;
-    await sendEmail(customer_email, 'Votre code de suivi Crystal Water', html);
-
-    const maskedEmail = customer_email.replace(/(.{2}).+(@.+)/, '$1***$2');
-    res.json({ ok: true, message: `Un email a été envoyé à ${maskedEmail}.` });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Une erreur est survenue.' });
   }
 });
 
