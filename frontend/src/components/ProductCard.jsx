@@ -192,7 +192,7 @@ export default function ProductCard({ product, autoOpen = false }) {
           <div ref={ripplesRef} className="absolute inset-0 pointer-events-none" />
 
           <div
-            className="relative bg-white rounded-2xl overflow-hidden w-[90vw] h-[88vh] max-w-6xl sm:flex"
+            className="relative bg-white rounded-2xl overflow-hidden w-[90vw] h-[88vh] max-w-6xl flex flex-col sm:flex-row"
             style={{
               transform: closing
                 ? 'scale(0.05) rotate(420deg)'
@@ -215,7 +215,7 @@ export default function ProductCard({ product, autoOpen = false }) {
             </button>
 
             <div
-              className="relative sm:w-1/2 h-64 sm:h-full bg-aqua cursor-zoom-in group"
+              className="relative sm:w-1/2 h-48 sm:h-full flex-shrink-0 bg-aqua cursor-zoom-in group"
               onClick={() => setShowLightbox(true)}
             >
               <img src={photoSrc} alt={product.name} className={`w-full h-full object-cover ${outOfStock ? 'grayscale' : ''}`} />
@@ -224,7 +224,7 @@ export default function ProductCard({ product, autoOpen = false }) {
               </div>
             </div>
 
-            <div className="p-8 sm:w-1/2 overflow-y-auto">
+            <div className="p-6 sm:p-8 sm:w-1/2 flex-1 min-h-0 overflow-y-auto">
               <div className="text-xs uppercase tracking-wide text-tealLight font-semibold mb-2">
                 {catObj ? (catObj[lang] || catObj.fr) : product.cat}
               </div>
@@ -319,3 +319,4 @@ export default function ProductCard({ product, autoOpen = false }) {
     </>
   );
 }
+
