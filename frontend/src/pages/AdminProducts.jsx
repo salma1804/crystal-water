@@ -18,8 +18,9 @@ function EditRow({ product, onSaved, token }) {
   const save = async () => {
     setSaving(true);
     try {
+      let res;
       if (isCustom) {
-        await fetch(`/api/products/custom/${realId}`, {
+        res = await fetch(`/api/products/custom/${realId}`, {
           method: 'PUT',
           headers: authHeaders,
           body: JSON.stringify({
@@ -29,15 +30,23 @@ function EditRow({ product, onSaved, token }) {
           }),
         });
       } else {
-        await fetch(`/api/products/overrides/${realId}`, {
+        res = await fetch(`/api/products/overrides/${realId}`, {
           method: 'PUT',
           headers: authHeaders,
           body: JSON.stringify({ price, old_price: oldPrice, discount, in_stock: inStock }),
         });
       }
+      if (res.status === 401) {
+        alert('Session expirée. Reconnectez-vous puis réessayez.');
+        return;
+      }
+      if (!res.ok) {
+        alert('Erreur lors de la sauvegarde (code ' + res.status + ').');
+        return;
+      }
       onSaved();
     } catch (err) {
-      alert('Erreur lors de la sauvegarde.');
+      alert('Impossible de contacter le serveur.');
     } finally {
       setSaving(false);
     }
@@ -46,17 +55,20 @@ function EditRow({ product, onSaved, token }) {
   const remove = async () => {
     if (!isCustom) return;
     if (!confirm(`Supprimer "${product.name}" définitivement ?`)) return;
-    await fetch(`/api/products/custom/${realId}`, {
+    const res = await fetch(`/api/products/custom/${realId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (!res.ok) {
+      alert(res.status === 401 ? 'Session expirée. Reconnectez-vous.' : 'Suppression impossible (code ' + res.status + ').');
+      return;
+    }
     onSaved();
   };
 
   return (
-    <tr className={`border-t border-ink/10 ${!inStock ? 'bg-red-50/40' : ''}`}>
+    <tr className={`border-t border-ink/10 ${!inStock ? 'opacity-60 bg-red-50' : ''}`}>
       <td className="py-2 px-3 text-sm max-w-[220px] truncate" title={product.name}>
-        {!inStock && <span className="mr-1.5">⚠️</span>}
         {product.name} {isCustom && <span className="text-[10px] bg-gold/30 text-ink px-1.5 py-0.5 rounded ml-1">créé</span>}
       </td>
       <td className="py-2 px-3">
@@ -257,20 +269,14 @@ export default function AdminProducts() {
   const { token } = useAdmin();
   const { products, loading, refresh } = useProductsAdmin();
   const [search, setSearch] = useState('');
-  const [onlyOutOfStock, setOnlyOutOfStock] = useState(false);
+  const [onlyOut, setOnlyOut] = useState(false);
 
-  const outOfStockCount = products.filter((p) => !p.inStock).length;
+  const outCount = products.filter((p) => p.inStock === false).length;
 
-  let filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  if (onlyOutOfStock) {
-    filtered = filtered.filter((p) => !p.inStock);
-  } else {
-    // Regroupe les ruptures de stock en premier, pour une vue d'ensemble rapide
-    filtered = [...filtered].sort((a, b) => Number(a.inStock) - Number(b.inStock));
-  }
+  const filtered = products
+    .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+    .filter((p) => !onlyOut || p.inStock === false)
+    .sort((a, b) => (a.inStock === false ? 0 : 1) - (b.inStock === false ? 0 : 1));
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
@@ -290,14 +296,12 @@ export default function AdminProducts() {
           className="w-full max-w-sm px-4 py-2.5 border border-ink/15 rounded-full text-sm"
         />
         <button
-          onClick={() => setOnlyOutOfStock((v) => !v)}
-          className={`px-4 py-2 rounded-full text-xs font-semibold border transition ${
-            onlyOutOfStock
-              ? 'bg-red-500 text-white border-red-500'
-              : 'border-ink/15 text-ink/70 hover:border-red-300'
+          onClick={() => setOnlyOut((v) => !v)}
+          className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
+            onlyOut ? 'bg-red-500 text-white border-red-500' : 'border-red-300 text-red-500 hover:bg-red-50'
           }`}
         >
-          ⚠️ Ruptures de stock ({outOfStockCount})
+          ⚠️ Ruptures de stock ({outCount})
         </button>
       </div>
 
@@ -322,9 +326,6 @@ export default function AdminProducts() {
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && (
-            <p className="text-sm text-ink/40 p-6 text-center">Aucun produit en rupture de stock. 🎉</p>
-          )}
           {filtered.length > 200 && (
             <p className="text-xs text-ink/40 p-3">Affinez la recherche — {filtered.length} résultats, 200 affichés.</p>
           )}
