@@ -205,11 +205,13 @@ export default function CategoryPage() {
       <div className="mb-10" />
 
       {catSubcategories.length > 0 && (
-        <div className="flex gap-2.5 flex-wrap mb-6">
+        <div className="flex gap-3 flex-wrap mb-8">
           <button
             onClick={() => setActiveSubcat(null)}
-            className={`px-4 py-2 rounded border text-sm font-medium transition ${
-              !activeSubcat ? 'bg-teal text-white border-teal' : 'border-ink/15 hover:border-teal'
+            className={`px-5 py-2.5 rounded-full border-[1.5px] text-sm font-semibold transition ${
+              !activeSubcat
+                ? 'bg-[#15677f] text-white border-[#15677f] shadow-[0_10px_20px_-12px_rgba(21,103,127,.8)]'
+                : 'bg-white text-[#07222d] border-[#d6e3e6] hover:border-[#15677f] hover:text-[#15677f] hover:-translate-y-0.5'
             }`}
           >
             Tout voir
@@ -218,8 +220,10 @@ export default function CategoryPage() {
             <button
               key={s.value}
               onClick={() => setActiveSubcat(s.value)}
-              className={`px-4 py-2 rounded border text-sm font-medium transition ${
-                activeSubcat === s.value ? 'bg-teal text-white border-teal' : 'border-ink/15 hover:border-teal'
+              className={`px-5 py-2.5 rounded-full border-[1.5px] text-sm font-semibold transition ${
+                activeSubcat === s.value
+                  ? 'bg-[#15677f] text-white border-[#15677f] shadow-[0_10px_20px_-12px_rgba(21,103,127,.8)]'
+                  : 'bg-white text-[#07222d] border-[#d6e3e6] hover:border-[#15677f] hover:text-[#15677f] hover:-translate-y-0.5'
               }`}
             >
               {s.fr}

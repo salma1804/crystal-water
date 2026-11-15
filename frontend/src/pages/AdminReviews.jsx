@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAdmin } from '../context/AdminContext.jsx';
+import { Icon, useAdminStats } from '../components/AdminShell.jsx';
 
 function stars(n) {
   return '★'.repeat(n) + '☆'.repeat(5 - n);
@@ -7,6 +8,7 @@ function stars(n) {
 
 export default function AdminReviews() {
   const { token } = useAdmin();
+  const { refresh } = useAdminStats();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,88 +23,80 @@ export default function AdminReviews() {
   useEffect(load, [token]);
 
   const approve = async (id) => {
-    await fetch(`/api/reviews/${id}/approve`, {
+    const res = await fetch(`/api/reviews/${id}/approve`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (!res.ok) { alert("L'avis n'a pas pu être approuvé. Réessayez."); return; }
     setReviews((rs) => rs.map((r) => (r.id === id ? { ...r, approved: true } : r)));
+    refresh();
   };
 
   const reject = async (id) => {
     if (!confirm('Supprimer définitivement cet avis ?')) return;
-    await fetch(`/api/reviews/${id}`, {
+    const res = await fetch(`/api/reviews/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (!res.ok) { alert("L'avis n'a pas pu être supprimé. Réessayez."); return; }
     setReviews((rs) => rs.filter((r) => r.id !== id));
+    refresh();
   };
 
   const pending = reviews.filter((r) => !r.approved);
   const approved = reviews.filter((r) => r.approved);
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="text-2xl font-bold mb-6">Avis clients</h1>
+    <>
+      <div className="adm-head">
+        <div>
+          <h1 className="adm-title">Avis clients</h1>
+          <p className="adm-sub">Un avis n'apparaît sur le site qu'après votre approbation.</p>
+        </div>
+      </div>
 
-      {loading && <p className="text-sm text-ink/50">Chargement...</p>}
+      {loading && <p className="adm-loading">Chargement des avis…</p>}
 
       {!loading && (
         <>
-          <h2 className="text-sm font-bold text-ink/70 uppercase tracking-wide mb-3">
-            En attente ({pending.length})
-          </h2>
+          <div className="adm-section-label">À modérer <span className="adm-chip adm-chip--amber">{pending.length}</span></div>
           {pending.length === 0 ? (
-            <p className="text-sm text-ink/40 mb-8">Aucun avis en attente.</p>
+            <div className="adm-empty"><b>Aucun avis en attente</b>Les nouveaux avis laissés sur le site arriveront ici.</div>
           ) : (
-            <div className="space-y-3 mb-10">
+            <div className="adm-list">
               {pending.map((r) => (
-                <div key={r.id} className="bg-white border border-ink/10 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-semibold">{r.customer_name}</span>
-                    <span className="text-gold text-sm">{stars(r.rating)}</span>
+                <div key={r.id} className="adm-card">
+                  <div className="adm-card__top">
+                    <span className="adm-card__name">{r.customer_name}</span>
+                    <span className="adm-stars" aria-label={`${r.rating} sur 5`}>{stars(r.rating)}</span>
                   </div>
-                  <p className="text-sm text-ink/70 mb-3">{r.message}</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => approve(r.id)}
-                      className="px-4 py-1.5 bg-teal text-white text-xs font-semibold rounded hover:bg-tealLight transition"
-                    >
-                      ✓ Approuver
-                    </button>
-                    <button
-                      onClick={() => reject(r.id)}
-                      className="px-4 py-1.5 border border-red-300 text-red-500 text-xs font-semibold rounded hover:bg-red-50 transition"
-                    >
-                      ✕ Rejeter
-                    </button>
+                  <p>{r.message}</p>
+                  <div className="adm-card__actions">
+                    <button onClick={() => approve(r.id)} className="adm-btn adm-btn--ok"><Icon name="check" size={16} /> Approuver</button>
+                    <button onClick={() => reject(r.id)} className="adm-btn adm-btn--danger">Supprimer</button>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          <h2 className="text-sm font-bold text-ink/50 uppercase tracking-wide mb-3">
-            Publiés ({approved.length})
-          </h2>
-          <div className="space-y-3">
+          <div className="adm-section-label">Publiés <span className="adm-chip adm-chip--kelp">{approved.length}</span></div>
+          <div className="adm-list">
             {approved.map((r) => (
-              <div key={r.id} className="bg-white border border-ink/5 rounded-lg p-4 opacity-70">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold">{r.customer_name}</span>
-                  <span className="text-gold text-sm">{stars(r.rating)}</span>
+              <div key={r.id} className="adm-card dim">
+                <div className="adm-card__top">
+                  <span className="adm-card__name">{r.customer_name}</span>
+                  <span className="adm-stars">{stars(r.rating)}</span>
                 </div>
-                <p className="text-sm text-ink/70 mb-2">{r.message}</p>
-                <button
-                  onClick={() => reject(r.id)}
-                  className="text-xs text-red-400 hover:text-red-600 transition"
-                >
-                  Retirer
-                </button>
+                <p>{r.message}</p>
+                <div className="adm-card__actions">
+                  <button onClick={() => reject(r.id)} className="adm-btn adm-btn--danger adm-btn--sm">Retirer du site</button>
+                </div>
               </div>
             ))}
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }

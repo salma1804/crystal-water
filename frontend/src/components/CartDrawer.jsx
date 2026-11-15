@@ -61,42 +61,48 @@ export default function CartDrawer() {
   return (
     <div
       className={`fixed inset-0 z-[200] flex items-center justify-center p-4 transition-colors duration-300 ${
-        visible ? 'bg-ink/60' : 'bg-ink/0'
+        visible ? 'bg-[#07222d]/70' : 'bg-[#07222d]/0'
       }`}
       onClick={requestClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative bg-mineral w-full max-w-4xl max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ease-out ${
+        className={`relative bg-[#edf4f5] w-full max-w-3xl max-h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ease-out ${
           visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
         }`}
       >
-        <div className="px-5 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-teal to-tealDeep text-white flex items-center justify-between flex-shrink-0">
-          <div>
-            <h2 className="font-display text-lg sm:text-2xl font-bold">🛒 {t('cart_title')}</h2>
-            {cart.length > 0 && (
-              <p className="text-white/70 text-xs sm:text-sm mt-0.5">
-                {cart.length} article{cart.length > 1 ? 's' : ''} dans votre panier
-              </p>
-            )}
+        <div className="px-7 py-5 bg-[#07222d] text-white flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="w-11 h-11 rounded-xl bg-[#15677f] flex items-center justify-center" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 7h14l-1.5 11a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7L5 7Z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg>
+            </span>
+            <div>
+              <h2 className="font-display text-2xl font-bold leading-tight">{t('cart_title')}</h2>
+              {cart.length > 0 && (
+                <p className="text-[#9fc4cf] text-sm">
+                  {cart.length} article{cart.length > 1 ? 's' : ''} dans votre panier
+                </p>
+              )}
+            </div>
           </div>
           <button
             onClick={requestClose}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition flex-shrink-0"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+            aria-label="Fermer"
           >
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-7">
           {grouped.length === 0 ? (
-            <div className="text-center py-20">
+            <div className="text-center py-16">
               <div className="text-6xl mb-4">💧</div>
-              <p className="text-lg font-semibold mb-1">{t('cart_empty')}</p>
-              <p className="text-sm text-ink/50">Découvrez nos produits et commencez votre commande.</p>
+              <p className="font-display text-xl font-bold text-[#07222d] mb-1">{t('cart_empty')}</p>
+              <p className="text-sm text-[#4a6670]">Découvrez nos produits et commencez votre commande.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+            <div className="flex flex-col gap-3">
               {grouped.map((p) => {
                 const photoSrc = p.hasRealPhoto
                   ? (p.isCustom ? p.image : imgUrl(p.image))
@@ -105,51 +111,53 @@ export default function CartDrawer() {
                 return (
                   <div
                     key={p.id}
-                    className="bg-white rounded-xl overflow-hidden border border-ink/10 hover:shadow-lg transition-shadow group"
+                    className="bg-white rounded-2xl border border-[#d6e3e6] p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:shadow-md transition-shadow group"
                   >
-                    <div className="relative aspect-square bg-aqua overflow-hidden">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl bg-gradient-to-b from-[#e3f1f4] to-[#cfe6ec] overflow-hidden">
                       <img
                         src={photoSrc}
                         alt={p.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => { e.currentTarget.src = '/product-images/placeholder.svg'; }}
                       />
-                      <button
-                        onClick={() => removeAllOfProduct(p.id)}
-                        className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-50 flex items-center justify-center text-red-500 shadow transition"
-                        title="Retirer du panier"
-                      >
-                        🗑
-                      </button>
-                      {p.qty > 1 && (
-                        <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-gold text-ink text-xs font-bold w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow">
-                          {p.qty}
-                        </span>
-                      )}
                     </div>
 
-                    <div className="p-2.5 sm:p-4">
-                      <p className="text-xs sm:text-sm font-semibold leading-tight mb-1.5 sm:mb-2 line-clamp-2 min-h-[2.2em] sm:min-h-[2.5em]">{p.name}</p>
-                      <div className="flex items-center justify-between flex-wrap gap-1">
-                        <span className="font-mono text-sm sm:text-lg font-bold text-tealDeep">
-                          {p.price * p.qty} د.ت
-                        </span>
-                        <div className="flex items-center gap-1 sm:gap-1.5">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-[15px] leading-snug text-[#07222d] line-clamp-2 mb-2">{p.name}</p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center border-[1.5px] border-[#d6e3e6] rounded-lg">
                           <button
                             onClick={() => removeOneFromCart(p.id)}
-                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-ink/15 flex items-center justify-center text-xs sm:text-sm font-semibold hover:border-teal hover:text-teal transition"
+                            className="w-8 h-8 flex items-center justify-center text-base font-semibold hover:text-[#15677f] transition"
+                            aria-label="Diminuer la quantité"
                           >
                             −
                           </button>
-                          <span className="text-xs sm:text-sm font-semibold min-w-[12px] sm:min-w-[14px] text-center">{p.qty}</span>
+                          <span className="text-sm font-semibold min-w-[22px] text-center">{p.qty}</span>
                           <button
                             onClick={() => addToCart(p)}
-                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-ink/15 flex items-center justify-center text-xs sm:text-sm font-semibold hover:border-teal hover:text-teal transition"
+                            className="w-8 h-8 flex items-center justify-center text-base font-semibold hover:text-[#15677f] transition"
+                            aria-label="Augmenter la quantité"
                           >
                             +
                           </button>
                         </div>
+                        <span className="text-xs text-[#4a6670]">{p.price} د.ت l'unité</span>
                       </div>
+                    </div>
+
+                    <div className="flex flex-col items-end justify-between self-stretch">
+                      <button
+                        onClick={() => removeAllOfProduct(p.id)}
+                        className="w-8 h-8 rounded-full hover:bg-[#fdecea] flex items-center justify-center text-[#d9483b] transition"
+                        title="Retirer du panier"
+                        aria-label="Retirer du panier"
+                      >
+                        🗑
+                      </button>
+                      <span className="font-display text-xl font-extrabold text-[#07222d] whitespace-nowrap">
+                        {p.price * p.qty} د.ت
+                      </span>
                     </div>
                   </div>
                 );
@@ -159,28 +167,29 @@ export default function CartDrawer() {
         </div>
 
         {grouped.length > 0 && (
-          <div className="px-5 sm:px-8 py-5 sm:py-6 bg-white border-t border-ink/10 flex-shrink-0">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm sm:text-base font-semibold text-ink/70">{t('cart_total')}</span>
-              <span className="font-mono text-2xl sm:text-3xl font-bold text-tealDeep">{total} د.ت</span>
+          <div className="px-5 sm:px-7 py-5 bg-white border-t border-[#d6e3e6] flex-shrink-0">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-base font-semibold text-[#33505b]">{t('cart_total')}</span>
+              <span className="font-display text-3xl font-extrabold text-[#07222d]">{total} د.ت</span>
             </div>
+            <p className="text-sm text-[#4a6670] mb-4">Vous payez à la livraison, rien à régler maintenant.</p>
 
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setIsOpen(false)}
-                className="order-3 sm:order-1 flex-1 py-2.5 sm:py-3 border border-ink/15 text-ink text-xs sm:text-sm font-semibold rounded-lg hover:border-teal transition"
+                className="order-3 sm:order-1 flex-1 py-3 border-[1.5px] border-[#d6e3e6] text-[#07222d] text-sm font-semibold rounded-xl hover:border-[#15677f] transition"
               >
                 Continuer mes achats
               </button>
               <button
                 onClick={handleClearCart}
-                className="order-2 flex-1 py-2.5 sm:py-3 border border-red-200 text-red-500 text-xs sm:text-sm font-semibold rounded-lg hover:bg-red-50 transition"
+                className="order-2 flex-1 py-3 border-[1.5px] border-[#f2c4bf] text-[#d9483b] text-sm font-semibold rounded-xl hover:bg-[#fdecea] transition"
               >
                 Vider le panier
               </button>
               <button
                 onClick={goToCheckout}
-                className="order-1 sm:order-3 flex-[1.5] py-2.5 sm:py-3 bg-teal text-white text-xs sm:text-sm font-bold rounded-lg hover:bg-tealLight transition shadow-lg shadow-teal/30"
+                className="order-1 sm:order-3 flex-[1.6] py-3 bg-[#2bb7d6] text-[#07222d] text-base font-bold rounded-xl hover:bg-[#5fcbe3] transition"
               >
                 Passer la commande →
               </button>

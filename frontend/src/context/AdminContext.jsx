@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AdminLogin from '../components/AdminLogin.jsx';
+import AdminShell from '../components/AdminShell.jsx';
 
 const AdminContext = createContext(null);
 const TOKEN_KEY = 'crystalwater_admin_token';
@@ -27,7 +29,7 @@ export function AdminProvider({ children }) {
       .finally(() => setChecked(true));
   }, [token]);
 
-  // login(password, code) : lance { mfaRequired: true } si le serveur demande le code
+  // login(password, code) : l'erreur porte mfaRequired = true si le serveur demande le code
   const login = async (password, code) => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
@@ -54,6 +56,7 @@ export function AdminProvider({ children }) {
         body: JSON.stringify({ token }),
       }).catch(() => {});
     }
+    try { sessionStorage.removeItem('cw_admin_intro'); } catch { /* ignore */ }
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setValid(false);
@@ -73,72 +76,13 @@ export function useAdmin() {
 }
 
 export function AdminGate({ children }) {
-  const { checked, valid, login } = useAdmin();
-  const [password, setPassword] = useState('');
-  const [code, setCode] = useState('');
-  const [needCode, setNeedCode] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await login(password, code);
-    } catch (err) {
-      if (err.mfaRequired) setNeedCode(true);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { checked, valid, login, logout, token } = useAdmin();
 
   if (!checked) {
-    return <div className="max-w-sm mx-auto px-6 py-24 text-center text-sm text-ink/50">Vérification...</div>;
+    return <div className="adm-splash"><i /></div>;
   }
-
   if (!valid) {
-    return (
-      <div className="max-w-sm mx-auto px-6 py-24">
-        <h1 className="text-xl font-bold mb-2 text-center">Accès administrateur</h1>
-        <p className="text-sm text-ink/60 mb-6 text-center">
-          {needCode ? "Entrez le code à 6 chiffres de votre application d'authentification." : 'Entrez le mot de passe pour continuer.'}
-        </p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mot de passe"
-            className="w-full px-4 py-3 border border-ink/15 rounded text-sm mb-3"
-            autoFocus={!needCode}
-          />
-          {needCode && (
-            <input
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              placeholder="Code à 6 chiffres"
-              className="w-full px-4 py-3 border border-ink/15 rounded text-sm mb-3 tracking-widest text-center"
-              autoFocus
-            />
-          )}
-          {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-teal text-white font-semibold rounded hover:bg-tealLight transition disabled:opacity-50"
-          >
-            {loading ? '...' : 'Se connecter'}
-          </button>
-        </form>
-      </div>
-    );
+    return <AdminLogin onSubmit={login} />;
   }
-
-  return children;
+  return <AdminShell token={token} onLogout={logout}>{children}</AdminShell>;
 }

@@ -3,6 +3,7 @@ import { useAdmin } from '../context/AdminContext.jsx';
 import { useProductsAdmin } from '../context/ProductsContext.jsx';
 import { categories } from '../i18n/translations.js';
 import { subcategories } from '../data/subcategories.js';
+import { Icon } from '../components/AdminShell.jsx';
 
 function EditRow({ product, onSaved, token }) {
   const [price, setPrice] = useState(product.price);
@@ -10,6 +11,7 @@ function EditRow({ product, onSaved, token }) {
   const [discount, setDiscount] = useState(product.discount);
   const [inStock, setInStock] = useState(product.inStock);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const isCustom = product.isCustom;
   const realId = isCustom ? product.id.replace('custom-', '') : product.id;
@@ -37,16 +39,18 @@ function EditRow({ product, onSaved, token }) {
         });
       }
       if (res.status === 401) {
-        alert('Session expirée. Reconnectez-vous puis réessayez.');
+        alert('Votre session a expiré. Reconnectez-vous, puis réessayez.');
         return;
       }
       if (!res.ok) {
-        alert('Erreur lors de la sauvegarde (code ' + res.status + ').');
+        alert('Le produit n\'a pas pu être enregistré (code ' + res.status + ').');
         return;
       }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1800);
       onSaved();
     } catch (err) {
-      alert('Impossible de contacter le serveur.');
+      alert('Le serveur ne répond pas. Réessayez dans un instant.');
     } finally {
       setSaving(false);
     }
@@ -54,54 +58,46 @@ function EditRow({ product, onSaved, token }) {
 
   const remove = async () => {
     if (!isCustom) return;
-    if (!confirm(`Supprimer "${product.name}" définitivement ?`)) return;
+    if (!confirm(`Supprimer « ${product.name} » définitivement ?`)) return;
     const res = await fetch(`/api/products/custom/${realId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) {
-      alert(res.status === 401 ? 'Session expirée. Reconnectez-vous.' : 'Suppression impossible (code ' + res.status + ').');
+      alert(res.status === 401 ? 'Votre session a expiré. Reconnectez-vous.' : 'Suppression impossible (code ' + res.status + ').');
       return;
     }
     onSaved();
   };
 
   return (
-    <tr className={`border-t border-ink/10 ${!inStock ? 'opacity-60 bg-red-50' : ''}`}>
-      <td className="py-2 px-3 text-sm max-w-[220px] truncate" title={product.name}>
-        {product.name} {isCustom && <span className="text-[10px] bg-gold/30 text-ink px-1.5 py-0.5 rounded ml-1">créé</span>}
+    <tr className={!inStock ? 'out' : ''}>
+      <td className="adm-pname" title={product.name}>
+        {product.name}{isCustom && <small>ajouté</small>}
       </td>
-      <td className="py-2 px-3">
-        <input type="number" value={oldPrice} onChange={(e) => setOldPrice(Number(e.target.value))} className="w-20 px-2 py-1 border border-ink/15 rounded text-sm" />
-      </td>
-      <td className="py-2 px-3">
-        <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} className="w-20 px-2 py-1 border border-ink/15 rounded text-sm" />
-      </td>
-      <td className="py-2 px-3">
-        <input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="w-16 px-2 py-1 border border-ink/15 rounded text-sm" />%
-      </td>
-      <td className="py-2 px-3">
-        <label className="flex items-center gap-1.5 text-xs">
-          <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="accent-teal" />
+      <td><input type="number" className="adm-cell-input" value={oldPrice} onChange={(e) => setOldPrice(Number(e.target.value))} aria-label="Prix barré" /></td>
+      <td><input type="number" className="adm-cell-input" value={price} onChange={(e) => setPrice(Number(e.target.value))} aria-label="Prix" /></td>
+      <td><input type="number" className="adm-cell-input narrow" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} aria-label="Remise en pourcentage" /> %</td>
+      <td>
+        <label className="adm-switch">
+          <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} />
+          <i />
           {inStock ? 'Disponible' : 'Rupture'}
         </label>
       </td>
-      <td className="py-2 px-3 flex gap-1.5">
-        <button onClick={save} disabled={saving} className="px-3 py-1.5 bg-teal text-white text-xs font-semibold rounded hover:bg-tealLight transition disabled:opacity-50">
-          {saving ? '...' : 'Enregistrer'}
-        </button>
-        {isCustom && (
-          <button onClick={remove} className="px-3 py-1.5 border border-red-300 text-red-500 text-xs font-semibold rounded hover:bg-red-50 transition">
-            Suppr.
+      <td>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={save} disabled={saving} className={`adm-btn adm-btn--sm ${saved ? 'adm-btn--ok' : 'adm-btn--primary'}`}>
+            {saving ? 'Envoi…' : saved ? 'Enregistré' : 'Enregistrer'}
           </button>
-        )}
+          {isCustom && <button onClick={remove} className="adm-btn adm-btn--sm adm-btn--danger">Supprimer</button>}
+        </div>
       </td>
     </tr>
   );
 }
 
-function AddProductForm({ onAdded, token }) {
-  const [open, setOpen] = useState(false);
+function AddProductForm({ onAdded, token, onClose }) {
   const [form, setForm] = useState({
     name: '', cat: categories[0]?.value || '', subcat: '', description: '',
     price: '', old_price: '', discount: 0, in_stock: true,
@@ -116,16 +112,12 @@ function AddProductForm({ onAdded, token }) {
 
   const update = (key) => (e) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setForm((f) => {
-      if (key === 'cat') return { ...f, cat: val, subcat: '' };
-      return { ...f, [key]: val };
-    });
+    setForm((f) => (key === 'cat' ? { ...f, cat: val, subcat: '' } : { ...f, [key]: val }));
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setImagePreview(URL.createObjectURL(file));
     setUploading(true);
     setError('');
@@ -138,7 +130,7 @@ function AddProductForm({ onAdded, token }) {
         body: fd,
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Échec de l'envoi de l'image.");
+      if (!res.ok) throw new Error(data.error || "La photo n'a pas pu être envoyée.");
       setImagePath(data.path);
     } catch (err) {
       setError(err.message);
@@ -151,7 +143,7 @@ function AddProductForm({ onAdded, token }) {
   const submit = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.price) {
-      setError('Nom et prix sont obligatoires.');
+      setError('Le nom et le prix sont obligatoires.');
       return;
     }
     setSaving(true);
@@ -172,94 +164,71 @@ function AddProductForm({ onAdded, token }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Impossible d'ajouter le produit.");
+        throw new Error(data.error || "Le produit n'a pas pu être ajouté.");
       }
-      setForm({ name: '', cat: categories[0]?.value || '', subcat: '', description: '', price: '', old_price: '', discount: 0, in_stock: true });
-      setImagePath('');
-      setImagePreview('');
-      setOpen(false);
       onAdded();
+      onClose();
     } catch (err) {
-      setError(err.message || "Impossible d'ajouter le produit.");
+      setError(err.message || "Le produit n'a pas pu être ajouté.");
     } finally {
       setSaving(false);
     }
   };
 
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="mb-6 px-5 py-2.5 bg-teal text-white text-sm font-semibold rounded hover:bg-tealLight transition"
-      >
-        + Ajouter un nouveau produit
-      </button>
-    );
-  }
-
   return (
-    <form onSubmit={submit} className="bg-white border border-ink/10 rounded-lg p-5 mb-8">
-      <h3 className="text-sm font-bold mb-4">Nouveau produit</h3>
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <label className="block text-xs font-semibold mb-1">Nom *</label>
-          <input value={form.name} onChange={update('name')} className="w-full px-3 py-2 border border-ink/15 rounded text-sm" />
+    <form onSubmit={submit} className="adm-panel adm-form">
+      <h2 className="adm-h2">Nouveau produit</h2>
+      <div className="adm-form__grid">
+        <div className="adm-field full">
+          <label>Nom *</label>
+          <input className="adm-input" value={form.name} onChange={update('name')} />
         </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1">Catégorie *</label>
-          <select value={form.cat} onChange={update('cat')} className="w-full px-3 py-2 border border-ink/15 rounded text-sm bg-white">
-            {categories.map((c) => (
-              <option key={c.value} value={c.value}>{c.fr}</option>
-            ))}
+        <div className="adm-field">
+          <label>Catégorie *</label>
+          <select className="adm-input" value={form.cat} onChange={update('cat')}>
+            {categories.map((c) => <option key={c.value} value={c.value}>{c.fr}</option>)}
           </select>
         </div>
-
-        {catSubcats.length > 0 && (
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold mb-1">Sous-catégorie</label>
-            <select value={form.subcat} onChange={update('subcat')} className="w-full px-3 py-2 border border-ink/15 rounded text-sm bg-white">
-              <option value="">— Aucune —</option>
-              {catSubcats.map((s) => (
-                <option key={s.value} value={s.value}>{s.fr}</option>
-              ))}
+        {catSubcats.length > 0 ? (
+          <div className="adm-field">
+            <label>Sous-catégorie</label>
+            <select className="adm-input" value={form.subcat} onChange={update('subcat')}>
+              <option value="">Aucune</option>
+              {catSubcats.map((s) => <option key={s.value} value={s.value}>{s.fr}</option>)}
             </select>
           </div>
-        )}
-
-        <div>
-          <label className="block text-xs font-semibold mb-1">Prix actuel (د.ت) *</label>
-          <input type="number" value={form.price} onChange={update('price')} className="w-full px-3 py-2 border border-ink/15 rounded text-sm" />
+        ) : <div />}
+        <div className="adm-field">
+          <label>Prix actuel (د.ت) *</label>
+          <input type="number" className="adm-input" value={form.price} onChange={update('price')} />
         </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1">Prix barré (د.ت)</label>
-          <input type="number" value={form.old_price} onChange={update('old_price')} placeholder="= prix actuel si vide" className="w-full px-3 py-2 border border-ink/15 rounded text-sm" />
+        <div className="adm-field">
+          <label>Prix barré (د.ت)</label>
+          <input type="number" className="adm-input" value={form.old_price} onChange={update('old_price')} placeholder="Identique au prix actuel si vide" />
         </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1">Remise (%)</label>
-          <input type="number" value={form.discount} onChange={update('discount')} className="w-full px-3 py-2 border border-ink/15 rounded text-sm" />
+        <div className="adm-field">
+          <label>Remise (%)</label>
+          <input type="number" className="adm-input" value={form.discount} onChange={update('discount')} />
         </div>
-
-        <div>
-          <label className="block text-xs font-semibold mb-1">Photo du produit</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} className="w-full text-xs" />
-          {uploading && <p className="text-xs text-ink/50 mt-1">Envoi en cours...</p>}
-          {imagePreview && (
-            <img src={imagePreview} alt="Aperçu" className="w-16 h-16 object-cover rounded mt-2 border border-ink/10" />
-          )}
+        <div className="adm-field">
+          <label>Photo du produit</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} style={{ fontSize: 13 }} />
+          {uploading && <p style={{ fontSize: 12.5, color: 'var(--muted)', margin: '6px 0 0' }}>Envoi de la photo…</p>}
+          {imagePreview && <img src={imagePreview} alt="Aperçu" className="adm-preview" />}
+        </div>
+        <div className="adm-field full">
+          <label>Description</label>
+          <textarea className="adm-input" rows={3} value={form.description} onChange={update('description')} />
         </div>
       </div>
-      <div className="mb-3">
-        <label className="block text-xs font-semibold mb-1">Description</label>
-        <textarea value={form.description} onChange={update('description')} rows={2} className="w-full px-3 py-2 border border-ink/15 rounded text-sm resize-none" />
-      </div>
-      {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
-      <div className="flex gap-2">
-        <button type="submit" disabled={saving || uploading} className="px-5 py-2 bg-teal text-white text-sm font-semibold rounded hover:bg-tealLight transition disabled:opacity-50">
-          {saving ? 'Ajout...' : 'Ajouter le produit'}
+
+      {error && <div className="adm-error" role="alert" style={{ marginTop: 14 }}><Icon name="alert" size={18} /> <span>{error}</span></div>}
+
+      <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+        <button type="submit" disabled={saving || uploading} className="adm-btn adm-btn--primary">
+          {saving ? 'Ajout…' : 'Ajouter le produit'}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-5 py-2 border border-ink/15 text-sm font-semibold rounded hover:border-teal transition">
-          Annuler
-        </button>
+        <button type="button" onClick={onClose} className="adm-btn adm-btn--ghost">Annuler</button>
       </div>
     </form>
   );
@@ -270,6 +239,7 @@ export default function AdminProducts() {
   const { products, loading, refresh } = useProductsAdmin();
   const [search, setSearch] = useState('');
   const [onlyOut, setOnlyOut] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const outCount = products.filter((p) => p.inStock === false).length;
 
@@ -279,45 +249,48 @@ export default function AdminProducts() {
     .sort((a, b) => (a.inStock === false ? 0 : 1) - (b.inStock === false ? 0 : 1));
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16">
-      <h1 className="text-2xl font-bold mb-2">Gestion des produits</h1>
-      <p className="text-sm text-ink/60 mb-6">
-        Modifie les prix, remises et le stock des produits existants, ou ajoute de nouveaux articles.
-      </p>
+    <>
+      <div className="adm-head">
+        <div>
+          <h1 className="adm-title">Produits</h1>
+          <p className="adm-sub">Modifiez les prix, les remises et la disponibilité. Chaque ligne s'enregistre séparément.</p>
+        </div>
+        {!adding && (
+          <button className="adm-btn adm-btn--primary" onClick={() => setAdding(true)}>
+            <Icon name="plus" size={16} /> Ajouter un produit
+          </button>
+        )}
+      </div>
 
-      <AddProductForm onAdded={refresh} token={token} />
+      {adding && <AddProductForm onAdded={refresh} token={token} onClose={() => setAdding(false)} />}
 
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher un produit..."
-          className="w-full max-w-sm px-4 py-2.5 border border-ink/15 rounded-full text-sm"
-        />
+      <div className="adm-toolbar">
+        <div className="adm-searchbox">
+          <Icon name="search" size={16} />
+          <input className="adm-input" placeholder="Rechercher un produit" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
         <button
           onClick={() => setOnlyOut((v) => !v)}
-          className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
-            onlyOut ? 'bg-red-500 text-white border-red-500' : 'border-red-300 text-red-500 hover:bg-red-50'
-          }`}
+          className={`adm-btn ${onlyOut ? 'adm-btn--solid-danger' : 'adm-btn--danger'}`}
+          aria-pressed={onlyOut}
         >
-          ⚠️ Ruptures de stock ({outCount})
+          <Icon name="alert" size={16} /> Ruptures de stock ({outCount})
         </button>
       </div>
 
       {loading ? (
-        <p className="text-sm text-ink/50">Chargement...</p>
+        <p className="adm-loading">Chargement du catalogue…</p>
+      ) : filtered.length === 0 ? (
+        <div className="adm-empty">
+          <b>Aucun produit trouvé</b>
+          {onlyOut ? 'Aucun produit n\'est en rupture de stock.' : 'Essayez un autre mot-clé.'}
+        </div>
       ) : (
-        <div className="overflow-x-auto bg-white border border-ink/10 rounded-lg">
-          <table className="w-full">
+        <div className="adm-table-wrap">
+          <table className="adm-table">
             <thead>
-              <tr className="bg-mineral2 text-left text-xs font-semibold text-ink/60 uppercase tracking-wide">
-                <th className="py-2.5 px-3">Produit</th>
-                <th className="py-2.5 px-3">Prix barré</th>
-                <th className="py-2.5 px-3">Prix</th>
-                <th className="py-2.5 px-3">Remise</th>
-                <th className="py-2.5 px-3">Stock</th>
-                <th className="py-2.5 px-3">Actions</th>
+              <tr>
+                <th>Produit</th><th>Prix barré</th><th>Prix</th><th>Remise</th><th>Stock</th><th />
               </tr>
             </thead>
             <tbody>
@@ -327,10 +300,12 @@ export default function AdminProducts() {
             </tbody>
           </table>
           {filtered.length > 200 && (
-            <p className="text-xs text-ink/40 p-3">Affinez la recherche — {filtered.length} résultats, 200 affichés.</p>
+            <p style={{ padding: 14, fontSize: 13, color: 'var(--muted)', margin: 0 }}>
+              {filtered.length} résultats, 200 affichés. Affinez la recherche pour voir les autres.
+            </p>
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero.jsx';
+import Trust from '../components/Trust.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
 import Categories from '../components/Categories.jsx';
 
@@ -27,6 +28,7 @@ export default function Home() {
         image="https://www.crystalwater.tn/og-image.jpg"
       />
       <Hero />
+      <Trust />
       <ProductGrid />
       <Categories />
       <Gallery />

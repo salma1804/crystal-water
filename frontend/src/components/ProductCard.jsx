@@ -75,7 +75,7 @@ export default function ProductCard({ product, autoOpen = false }) {
         ring.style.height = '20px';
         ring.style.marginLeft = '-10px';
         ring.style.marginTop = '-10px';
-        ring.style.border = '2px solid #6EC8E6';
+        ring.style.border = '2px solid #2bb7d6';
         ring.style.borderRadius = '50%';
         ring.style.opacity = '0.8';
         ring.style.pointerEvents = 'none';
@@ -103,12 +103,12 @@ export default function ProductCard({ product, autoOpen = false }) {
     <>
       <div
         id={`product-${product.id}`}
-        className={`bg-white border border-ink/10 rounded overflow-hidden flex flex-col transition ${
-          outOfStock ? 'opacity-60' : 'hover:shadow-xl hover:-translate-y-1'
+        className={`bg-white border border-[#d6e3e6] rounded-2xl overflow-hidden flex flex-col transition duration-200 ${
+          outOfStock ? 'opacity-70' : 'hover:shadow-[0_18px_36px_-18px_rgba(7,34,45,.35)] hover:-translate-y-1'
         }`}
       >
         <div
-          className="relative aspect-[10/9] overflow-hidden bg-aqua cursor-pointer"
+          className="relative aspect-[10/9] overflow-hidden bg-gradient-to-b from-[#e3f1f4] to-[#cfe6ec] cursor-pointer"
           onClick={openDetail}
         >
           <img
@@ -119,46 +119,46 @@ export default function ProductCard({ product, autoOpen = false }) {
             onError={(e) => { e.currentTarget.src = '/product-images/placeholder.svg'; }}
           />
           {!outOfStock && (
-            <div className="absolute top-3 left-3 bg-gold text-ink text-xs font-bold w-11 h-11 rounded-full flex items-center justify-center">
+            <div className="absolute top-3 left-3 bg-[#d9483b] text-white text-[13px] font-bold px-2.5 py-1 rounded-full shadow">
               -{product.discount}%
             </div>
           )}
           {outOfStock && (
-            <div className="absolute inset-0 bg-ink/30 flex items-center justify-center">
-              <span className="bg-ink/80 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+            <div className="absolute inset-0 bg-[#07222d]/35 flex items-center justify-center">
+              <span className="bg-[#07222d] text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                 Rupture de stock
               </span>
             </div>
           )}
         </div>
         <div className="p-4 flex flex-col gap-2 flex-1">
-          <div className="text-xs uppercase tracking-wide text-tealLight font-semibold">
+          <div className="text-[13px] text-[#4a6670] font-medium">
             {catObj ? (catObj[lang] || catObj.fr) : product.cat}
           </div>
-          <div className="text-sm font-semibold leading-tight">{product.name}</div>
-          <p className="text-xs text-ink/60 leading-snug line-clamp-2">{product.description}</p>
-          <div className="flex items-center gap-1 text-xs text-ink/55">
-            <span className="text-gold tracking-wider">{stars(product.rating)}</span>
+          <div className="font-display text-[17px] font-bold leading-snug text-[#07222d]">{product.name}</div>
+          <p className="text-[13px] text-[#4a6670] leading-snug line-clamp-2">{product.description}</p>
+          <div className="flex items-center gap-1.5 text-xs text-[#4a6670]">
+            <span className="text-[#e3a93b] tracking-wider">{stars(product.rating)}</span>
             {product.rating} ({product.reviews} {t('reviews_word')})
           </div>
           <div className="flex items-baseline gap-2 mt-auto pt-1">
-            <span className="text-xs text-ink/40 line-through font-mono">{product.old} د.ت</span>
-            <span className="font-mono text-lg font-semibold text-tealDeep">{product.price} د.ت</span>
+            <span className="font-display text-[26px] font-extrabold text-[#07222d]">{product.price} د.ت</span>
+            <span className="text-sm text-[#5b7480] line-through">{product.old} د.ت</span>
           </div>
 
-          <label className={`flex items-center gap-2 text-xs font-medium px-2.5 py-1.5 rounded border cursor-pointer select-none transition ${
+          <label className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg border cursor-pointer select-none transition ${
             isComparing
-              ? 'bg-teal text-white border-teal'
+              ? 'bg-[#15677f] text-white border-[#15677f]'
               : compareDisabled
-              ? 'text-ink/30 border-ink/10 cursor-not-allowed'
-              : 'text-ink/70 border-ink/15 hover:border-teal'
+              ? 'text-ink/30 border-[#d6e3e6] cursor-not-allowed'
+              : 'text-[#33505b] border-[#d6e3e6] hover:border-[#15677f]'
           }`}>
             <input
               type="checkbox"
               checked={isComparing}
               disabled={compareDisabled}
               onChange={() => toggleCompare(product.id)}
-              className="w-3.5 h-3.5 accent-teal"
+              className="w-3.5 h-3.5 accent-[#15677f]"
             />
             ⚖️ {isComparing ? 'Ajouté à comparer' : 'Ajouter à comparer'}
           </label>
@@ -166,14 +166,14 @@ export default function ProductCard({ product, autoOpen = false }) {
           <div className="flex gap-2 mt-1">
             <button
               onClick={openDetail}
-              className="flex-1 py-2.5 border border-ink/15 text-ink text-sm font-semibold rounded hover:border-teal transition"
+              className="flex-1 py-2.5 border-[1.5px] border-[#d6e3e6] text-[#07222d] text-sm font-semibold rounded-[10px] hover:border-[#15677f] transition"
             >
               {voirLabel[lang] || voirLabel.fr}
             </button>
             <button
               onClick={handleAddToCart}
               disabled={outOfStock}
-              className="flex-1 py-2.5 bg-mineral2 text-tealDeep text-sm font-semibold rounded hover:bg-teal hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-mineral2 disabled:hover:text-tealDeep"
+              className="flex-[1.4] py-2.5 bg-[#15677f] text-white text-sm font-semibold rounded-[10px] hover:bg-[#0c3a4a] transition disabled:bg-[#e3eaec] disabled:text-[#5b7480] disabled:cursor-not-allowed"
             >
               {outOfStock ? 'Indisponible' : t('add_to_cart')}
             </button>
@@ -183,7 +183,7 @@ export default function ProductCard({ product, autoOpen = false }) {
 
       {showDetail && createPortal(
         <div
-          className="fixed inset-0 bg-ink/60 z-[260] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-[#07222d]/70 z-[260] flex items-center justify-center p-4"
           onClick={(e) => {
             e.stopPropagation();
             if (e.target === e.currentTarget) closeDetail();
@@ -192,7 +192,7 @@ export default function ProductCard({ product, autoOpen = false }) {
           <div ref={ripplesRef} className="absolute inset-0 pointer-events-none" />
 
           <div
-            className="relative bg-white rounded-2xl overflow-hidden w-[90vw] h-[88vh] max-w-6xl flex flex-col sm:flex-row"
+            className="relative bg-white rounded-3xl overflow-hidden w-[92vw] h-[88vh] max-w-6xl flex flex-col sm:flex-row shadow-2xl"
             style={{
               transform: closing
                 ? 'scale(0.05) rotate(420deg)'
@@ -208,85 +208,95 @@ export default function ProductCard({ product, autoOpen = false }) {
           >
             <button
               onClick={(e) => { e.stopPropagation(); closeDetail(); }}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center text-lg z-10"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-lg z-10 text-[#07222d] hover:bg-[#edf4f5] transition"
               aria-label="Fermer"
             >
               ✕
             </button>
 
             <div
-              className="relative sm:w-1/2 h-48 sm:h-full flex-shrink-0 bg-aqua cursor-zoom-in group"
+              className="relative sm:w-1/2 h-64 sm:h-full flex-shrink-0 bg-gradient-to-b from-[#e3f1f4] to-[#cfe6ec] cursor-zoom-in group"
               onClick={() => setShowLightbox(true)}
             >
               <img src={photoSrc} alt={product.name} className={`w-full h-full object-cover ${outOfStock ? 'grayscale' : ''}`} />
-              <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/20 transition-colors flex items-center justify-center">
+              {!outOfStock && (
+                <span className="absolute top-4 left-4 bg-[#d9483b] text-white text-sm font-bold px-3 py-1 rounded-full shadow">
+                  -{product.discount}%
+                </span>
+              )}
+              <div className="absolute inset-0 bg-[#07222d]/0 group-hover:bg-[#07222d]/20 transition-colors flex items-center justify-center">
                 <span className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-2xl">🔍</span>
               </div>
+              <span className="absolute bottom-4 left-4 bg-white/95 text-[#07222d] text-xs font-semibold px-3 py-1.5 rounded-full shadow">
+                Cliquez pour agrandir
+              </span>
             </div>
 
-            <div className="p-6 sm:p-8 sm:w-1/2 flex-1 min-h-0 overflow-y-auto">
-              <div className="text-xs uppercase tracking-wide text-tealLight font-semibold mb-2">
+            <div className="flex-1 min-h-0 p-6 sm:p-9 overflow-y-auto">
+              <div className="text-sm text-[#15677f] font-semibold mb-2">
                 {catObj ? (catObj[lang] || catObj.fr) : product.cat}
               </div>
-              <h3 className="text-2xl font-bold mb-4">{product.name}</h3>
+              <h3 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-[#07222d] mb-3 pr-10">{product.name}</h3>
+
+              <div className="flex items-center gap-1.5 text-sm text-[#4a6670] mb-5">
+                <span className="text-[#e3a93b] tracking-wider">{stars(product.rating)}</span>
+                {product.rating} ({product.reviews} {t('reviews_word')})
+              </div>
 
               {outOfStock && (
-                <div className="bg-ink/10 text-ink/70 text-sm font-semibold px-3 py-2 rounded mb-4 inline-block">
+                <div className="bg-[#07222d] text-white text-sm font-semibold px-3 py-2 rounded-lg mb-4 inline-block">
                   ⚠️ Rupture de stock — disponible bientôt
                 </div>
               )}
 
-              <hr className="border-ink/10 mb-5" />
-
-              <p className="text-sm text-ink/70 mb-5 leading-relaxed">{product.description}</p>
+              <p className="text-[15px] text-[#33505b] mb-5 leading-relaxed">{product.description}</p>
 
               {product.specs && product.specs.length > 0 && (
-                <ul className="space-y-3 mb-6">
+                <ul className="mb-6 rounded-xl border border-[#d6e3e6] divide-y divide-[#d6e3e6] overflow-hidden">
                   {product.specs.map((s, i) => (
-                    <li key={i} className="text-sm">
-                      <span className="font-semibold text-tealDeep">{s.label}</span>
-                      {' — '}
-                      <span className="text-ink/70">{s.value}</span>
+                    <li key={i} className="text-sm flex gap-3 px-4 py-2.5 odd:bg-[#f6fafb]">
+                      <span className="font-semibold text-[#0c3a4a] w-2/5 flex-shrink-0">{s.label}</span>
+                      <span className="text-[#33505b]">{s.value}</span>
                     </li>
                   ))}
                 </ul>
               )}
 
-              <div className="flex items-center gap-1 text-xs text-ink/55 mb-6">
-                <span className="text-gold tracking-wider">{stars(product.rating)}</span>
-                {product.rating} ({product.reviews} {t('reviews_word')})
-              </div>
+              <ul className="mb-6 space-y-2 text-sm text-[#33505b]">
+                <li className="flex items-center gap-2"><span className="text-[#2c9a6a] font-bold">✓</span>Livraison dans toute la Tunisie</li>
+                <li className="flex items-center gap-2"><span className="text-[#2c9a6a] font-bold">✓</span>Paiement à la livraison</li>
+              </ul>
 
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+                <div className="flex items-center border-[1.5px] border-[#d6e3e6] rounded-xl">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     disabled={outOfStock}
-                    className="w-9 h-9 rounded-full border border-ink/15 text-lg font-semibold hover:border-teal transition disabled:opacity-40"
+                    className="w-11 h-11 text-xl font-semibold text-[#07222d] hover:text-[#15677f] transition disabled:opacity-40"
                     aria-label="Diminuer la quantité"
                   >
                     −
                   </button>
-                  <span className="text-base font-semibold min-w-[20px] text-center">{qty}</span>
+                  <span className="text-base font-semibold min-w-[32px] text-center">{qty}</span>
                   <button
                     onClick={() => setQty((q) => q + 1)}
                     disabled={outOfStock}
-                    className="w-9 h-9 rounded-full border border-ink/15 text-lg font-semibold hover:border-teal transition disabled:opacity-40"
+                    className="w-11 h-11 text-xl font-semibold text-[#07222d] hover:text-[#15677f] transition disabled:opacity-40"
                     aria-label="Augmenter la quantité"
                   >
                     +
                   </button>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm text-ink/40 line-through font-mono">{product.old} د.ت</span>
-                  <span className="font-mono text-2xl font-semibold text-tealDeep">{product.price * qty} د.ت</span>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-base text-[#5b7480] line-through">{product.old * qty} د.ت</span>
+                  <span className="font-display text-4xl font-extrabold text-[#07222d]">{product.price * qty} د.ت</span>
                 </div>
               </div>
 
               <button
                 onClick={handleAddToCart}
                 disabled={outOfStock}
-                className="w-full py-3.5 bg-teal text-white font-semibold rounded hover:bg-tealLight transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-[#15677f] text-white text-base font-semibold rounded-xl hover:bg-[#0c3a4a] transition disabled:bg-[#e3eaec] disabled:text-[#5b7480] disabled:cursor-not-allowed"
               >
                 {outOfStock ? 'Indisponible' : t('add_to_cart')}
               </button>
@@ -319,4 +329,3 @@ export default function ProductCard({ product, autoOpen = false }) {
     </>
   );
 }
-

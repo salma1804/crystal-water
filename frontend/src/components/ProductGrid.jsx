@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { useLang } from '../context/LangContext.jsx';
-import { products } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import ProductCard from './ProductCard.jsx';
 
 export default function ProductGrid() {
   const { t } = useLang();
+  const products = useProducts();
   const scrollRef = useRef(null);
 
   // Les articles les plus en promo, en tête de la bande
@@ -21,23 +22,24 @@ export default function ProductGrid() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-end flex-wrap gap-4 mb-8 reveal">
           <div>
-            <h2 className="text-3xl font-bold mb-1">{t('shop_title')}</h2>
-            <p className="text-ink/60 max-w-md text-sm">{t('shop_sub')}</p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#07222d] mb-3">{t('shop_title')}</h2>
+            <div className="w-14 h-1 rounded-full bg-[#15677f] mb-3" />
+            <p className="text-[#4a6670] text-base leading-relaxed max-w-md">{t('shop_sub')}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={() => scrollBy(-1)}
               aria-label="Précédent"
-              className="w-10 h-10 rounded-full border border-ink/15 flex items-center justify-center text-teal hover:bg-teal hover:text-white hover:border-teal transition"
+              className="w-12 h-12 rounded-full bg-[#15677f] text-white flex items-center justify-center shadow-[0_12px_24px_-12px_rgba(21,103,127,.8)] hover:bg-[#2bb7d6] hover:text-[#07222d] hover:scale-105 active:scale-95 transition"
             >
-              &lt;
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
             </button>
             <button
               onClick={() => scrollBy(1)}
               aria-label="Suivant"
-              className="w-10 h-10 rounded-full border border-ink/15 flex items-center justify-center text-teal hover:bg-teal hover:text-white hover:border-teal transition"
+              className="w-12 h-12 rounded-full bg-[#15677f] text-white flex items-center justify-center shadow-[0_12px_24px_-12px_rgba(21,103,127,.8)] hover:bg-[#2bb7d6] hover:text-[#07222d] hover:scale-105 active:scale-95 transition"
             >
-              &gt;
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>

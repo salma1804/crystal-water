@@ -186,6 +186,14 @@ export default function AIDiagnosticChat() {
         className="fixed z-[150] flex items-end gap-3"
         style={pos ? { left: pos.x, top: pos.y } : { left: 24, bottom: 24 }}
       >
+        <div className="relative w-[68px] h-[68px] flex-shrink-0">
+        {!open && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 rounded-full bg-[#2bb7d6] opacity-50 animate-ping motion-reduce:animate-none pointer-events-none"
+            style={{ animationDuration: '2.4s' }}
+          />
+        )}
         <button
           ref={btnRef}
           onMouseDown={(e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); }}
@@ -193,19 +201,20 @@ export default function AIDiagnosticChat() {
           onClick={handleButtonClick}
           onDragStart={(e) => e.preventDefault()}
           draggable={false}
-          className="w-14 h-14 rounded-full bg-teal shadow-lg flex items-center justify-center hover:scale-105 transition flex-shrink-0 cursor-grab active:cursor-grabbing touch-none select-none"
+          className="absolute inset-0 rounded-full bg-gradient-to-br from-[#2bb7d6] to-[#15677f] shadow-[0_18px_34px_-14px_rgba(21,103,127,.8)] flex items-center justify-center hover:scale-105 transition cursor-grab active:cursor-grabbing touch-none select-none"
           aria-label="Assistant eau (glisser pour déplacer)"
         >
           {showHint && !open && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold rounded-full animate-ping" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#e3a93b] rounded-full animate-ping" />
           )}
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="white" draggable="false">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="white" draggable="false">
             <path d="M12 2C12 2 5 11 5 15.5C5 19.09 8.13 22 12 22C15.87 22 19 19.09 19 15.5C19 11 12 2 12 2Z" />
           </svg>
         </button>
+        </div>
 
         {showHint && !open && (
-          <div className="relative bg-white rounded-2xl rounded-bl-sm shadow-lg px-4 py-2.5 text-sm text-ink max-w-[210px] animate-chat-pop">
+          <div className="relative bg-white border border-[#d6e3e6] rounded-2xl rounded-bl-sm shadow-[0_14px_30px_-18px_rgba(7,34,45,.5)] px-4 py-3 text-sm font-medium text-[#07222d] max-w-[230px] animate-chat-pop">
             💬 Un problème d'eau ? Contactez-nous, notre assistant peut vous aider !
             <button
               onClick={() => setShowHint(false)}
@@ -220,36 +229,40 @@ export default function AIDiagnosticChat() {
 
       {open && (
         <div
-          className="fixed z-[151] w-[380px] max-w-[92vw] h-[560px] max-h-[80vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-chat-pop"
+          className="fixed z-[151] w-[380px] max-w-[92vw] h-[560px] max-h-[80vh] bg-white border border-[#d6e3e6] rounded-[26px] shadow-[0_40px_80px_-40px_rgba(7,34,45,.6)] overflow-hidden flex flex-col animate-chat-pop"
           style={panelStyle}
         >
-          <div className="bg-teal text-white px-4 py-3.5 flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+          <div className="bg-gradient-to-br from-[#07222d] to-[#0c3a4a] text-white px-4 py-4 flex items-center gap-3 flex-shrink-0">
+            <span className="relative w-11 h-11 rounded-full bg-[#15677f] flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
                 <path d="M12 2C12 2 5 11 5 15.5C5 19.09 8.13 22 12 22C15.87 22 19 19.09 19 15.5C19 11 12 2 12 2Z" />
               </svg>
-              <span className="text-sm font-semibold">Assistant Eau Crystal</span>
+              <span className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-[#3fcf8e] border-2 border-[#0c3a4a]" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-display font-bold text-[17px] leading-tight">Assistant Eau Crystal</div>
+              <div className="text-[13px] text-[#9fc4cf]">Répond en quelques secondes</div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white text-lg leading-none">
+            <button onClick={() => setOpen(false)} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Fermer">
               ✕
             </button>
           </div>
 
-          <div ref={bodyRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div ref={bodyRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#f6fafb]">
             {history.length === 0 && !loading && (
-              <div className="bg-mineral2 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-sm text-ink/80">
+              <div className="bg-white border border-[#d6e3e6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-sm text-ink/80">
                 👋 Bonjour ! Décrivez-moi votre problème d'eau (calcaire, goût, odeur, débit...) et je vous recommande les produits adaptés.
               </div>
             )}
 
             {history.map((entry, idx) => (
               <div key={idx} className="space-y-3">
-                <div className="ml-auto bg-teal text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm w-fit">
+                <div className="ml-auto bg-[#15677f] text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm w-fit">
                   {entry.problem}
                 </div>
 
                 <div className="water-fill-in">
-                  <div className="bg-mineral2 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[90%] text-sm text-ink/80 mb-3">
+                  <div className="bg-white border border-[#d6e3e6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[90%] text-sm text-ink/80 mb-3">
                     {entry.result.summary}
                   </div>
 
@@ -269,7 +282,7 @@ export default function AIDiagnosticChat() {
                           <div
                             key={rec.id}
                             style={{ animationDelay: `${0.15 + i * 0.08}s` }}
-                            className="water-fill-in-item bg-white border border-ink/10 rounded-xl p-2.5 hover:border-teal hover:shadow-md transition"
+                            className="water-fill-in-item bg-white border border-[#d6e3e6] rounded-2xl p-3 hover:border-[#15677f] hover:shadow-md transition"
                           >
                             <button
                               onClick={() => goToProduct(p.id, p.cat)}
@@ -279,15 +292,15 @@ export default function AIDiagnosticChat() {
                               <div className="flex-1 min-w-0">
                                 <div className="text-xs font-semibold leading-tight mb-0.5 truncate">{p.name}</div>
                                 <div className="text-[11px] text-ink/55 leading-snug line-clamp-2 mb-1">{rec.reason}</div>
-                                <div className="font-mono text-xs font-semibold text-tealDeep">{p.price} د.ت</div>
+                                <div className="font-display text-sm font-extrabold text-[#15677f]">{p.price} د.ت</div>
                               </div>
                             </button>
                             <button
                               onClick={(e) => handleAddToCart(e, p)}
-                              className={`w-full mt-2 py-2 rounded-lg text-xs font-semibold transition ${
+                              className={`w-full mt-2 py-2.5 rounded-xl text-[13px] font-semibold transition ${
                                 addedId === p.id
-                                  ? 'bg-teal/10 text-teal'
-                                  : 'bg-teal text-white hover:bg-tealLight'
+                                  ? 'bg-[#15677f]/10 text-[#15677f]'
+                                  : 'bg-[#15677f] text-white hover:bg-[#0c3a4a]'
                               }`}
                             >
                               {addedId === p.id ? '✓ Ajouté au panier' : '+ Ajouter au panier'}
@@ -303,10 +316,10 @@ export default function AIDiagnosticChat() {
 
             {loading && (
               <>
-                <div className="ml-auto bg-teal text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm w-fit opacity-70">
+                <div className="ml-auto bg-[#15677f] text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm w-fit opacity-70">
                   ...
                 </div>
-                <div className="bg-mineral2 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[60%] flex gap-1 items-center">
+                <div className="bg-white border border-[#d6e3e6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[60%] flex gap-1 items-center">
                   <span className="w-1.5 h-1.5 bg-ink/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
                   <span className="w-1.5 h-1.5 bg-ink/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
                   <span className="w-1.5 h-1.5 bg-ink/40 rounded-full animate-bounce" />
@@ -315,25 +328,25 @@ export default function AIDiagnosticChat() {
             )}
 
             {error && (
-              <div className="bg-red-50 text-red-500 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-sm">
+              <div className="bg-[#fdecea] text-[#a8321f] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-sm">
                 {error}
               </div>
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-shrink-0 border-t border-ink/10 p-3 flex gap-2">
+          <form onSubmit={handleSubmit} className="flex-shrink-0 border-t border-[#d6e3e6] bg-white p-3 flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={history.length === 0 ? 'Décrivez votre problème...' : 'Une autre question ?'}
               disabled={loading}
-              className="flex-1 px-3.5 py-2.5 rounded-full border border-ink/15 text-sm focus:outline-none focus:border-teal transition"
+              className="flex-1 px-4 py-3 rounded-full border-[1.5px] border-[#d6e3e6] text-sm placeholder:text-[#8aa0a8] focus:outline-none focus:border-[#15677f] focus:ring-4 focus:ring-[#2bb7d6]/20 transition"
             />
             <button
               type="submit"
               disabled={loading}
-              className="w-10 h-10 rounded-full bg-teal text-white flex items-center justify-center hover:bg-tealLight transition disabled:opacity-50 flex-shrink-0"
+              className="w-11 h-11 rounded-full bg-[#15677f] text-white flex items-center justify-center hover:bg-[#0c3a4a] transition disabled:opacity-50 flex-shrink-0"
               aria-label="Envoyer"
             >
               <svg viewBox="0 0 24 24" width="18" height="18" fill="white">

@@ -21,9 +21,10 @@ export default function ApprovedReviews() {
   return (
     <section className="py-16">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold mb-2">Ce que disent nos clients</h2>
-          <p className="text-sm text-ink/60">Des avis vérifiés de clients Crystal Water.</p>
+        <div className="mb-10">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#07222d] mb-3">Ce que disent nos clients</h2>
+          <div className="w-14 h-1 rounded-full bg-[#15677f] mb-3" />
+          <p className="text-[#4a6670] text-base leading-relaxed">Des avis vérifiés de clients Crystal Water.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

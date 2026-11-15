@@ -2,10 +2,10 @@ import React from 'react';
 import { useLang } from '../context/LangContext.jsx';
 
 const steps = [
-  { num: '01', tKey: 'proc1' },
-  { num: '02', tKey: 'proc2' },
-  { num: '03', tKey: 'proc3' },
-  { num: '04', tKey: 'proc4' },
+  { num: 1, tKey: 'proc1' },
+  { num: 2, tKey: 'proc2' },
+  { num: 3, tKey: 'proc3' },
+  { num: 4, tKey: 'proc4' },
 ];
 
 const stepText = {
@@ -26,28 +26,47 @@ const stepText = {
     proc2: ['تركيب', 'تركيب من طرف فنيينا، حسب قيودك التقنية.'],
     proc3: ['تشغيل', 'ضبط دقيق لكل معيار لأداء أمثل.'],
     proc4: ['متابعة', 'فحوصات دورية لإطالة عمر تركيبك.'],
-  }
+  },
 };
 
 export default function Process() {
-  const { t, lang } = useLang();
+  const { lang } = useLang();
   const texts = stepText[lang] || stepText.fr;
 
   return (
-    <section id="services" className="py-20 bg-tealDeep text-mineral">
-      <div className="max-w-6xl mx-auto px-6 mb-11 reveal">
-        <h2 className="text-3xl font-bold mb-1 text-mineral">
+    <section
+      id="services"
+      className="relative py-24 text-white overflow-hidden"
+      style={{ background: 'linear-gradient(160deg,#07222d 0%,#0c3a4a 60%,#15677f 140%)' }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full"
+        style={{ background: 'radial-gradient(circle,rgba(43,183,214,.28),rgba(43,183,214,0) 65%)' }}
+      />
+      <div className="relative max-w-6xl mx-auto px-6">
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">
           {lang === 'ar' ? 'كيف تسير العملية' : lang === 'en' ? 'How it works' : 'Comment ça se passe'}
         </h2>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
-        {steps.map((s) => (
-          <div key={s.num} className="bg-tealDeep p-8">
-            <div className="font-mono text-xs text-goldLight mb-3">{s.num}</div>
-            <h3 className="text-lg font-semibold mb-2">{texts[s.tKey][0]}</h3>
-            <p className="text-sm text-white/65">{texts[s.tKey][1]}</p>
-          </div>
-        ))}
+        <div className="w-14 h-1 rounded-full bg-[#2bb7d6] mb-3" />
+        <p className="text-white/75 text-base leading-relaxed mb-12 max-w-xl">
+          {lang === 'ar' ? 'من التشخيص إلى المتابعة، أربع خطوات بسيطة.' : lang === 'en' ? 'From diagnosis to follow-up, four simple steps.' : 'Du diagnostic au suivi, quatre étapes simples.'}
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+          {steps.map((s) => (
+            <div
+              key={s.num}
+              className="relative bg-white/[0.06] border border-white/15 backdrop-blur rounded-3xl p-7 transition hover:bg-white/10 hover:-translate-y-1"
+            >
+              <div className="w-11 h-11 rounded-full bg-[#2bb7d6] text-[#07222d] font-display font-bold text-lg flex items-center justify-center mb-5">
+                {s.num}
+              </div>
+              <h3 className="font-display text-xl font-bold mb-2">{texts[s.tKey][0]}</h3>
+              <p className="text-sm text-white/75 leading-relaxed">{texts[s.tKey][1]}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
